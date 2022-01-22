@@ -1,12 +1,5 @@
 {
     "macro_to_reload_elements": {
-        "_initWiedzaHint": [
-            {
-                "macro_type": "func_call",
-                "func_name": "_wiedza_hint_init",
-                "func_args": []
-            }
-        ]
     },
     "fields": [
         {
@@ -16,10 +9,10 @@
             "macros_on_modify": []
         },
         {
-            "name": "mc.wiedza.showhint",
-            "default_value": false,
-            "field_type": "boolean",
-            "macros_on_modify": ["_initWiedzaHint"]
+            "name": "eld.enemynames.enemy_name_rewrite_mode",
+            "default_value": "1",
+            "field_type": "string",
+            "macros_on_modify": ["_initEnemyNames"]
         }
     ]
 }
