@@ -3,21 +3,6 @@ eld.guardhelper = eld.guardhelper or {
   state = {}
 }
 
-function follow_path()
-    if amap.path_display.destination then
-    getPath(amap.curr.id, amap.path_display.destination)
-    if speedWalkDir and speedWalkDir[1] then
-        if amap.short_to_long[speedWalkDir[1]] then
-        amap:keybind_pressed(amap.short_to_long[speedWalkDir[1]])
-        else
-        send(speedWalkDir[1])
-        end
-    end
-    else
-      expandAlias("/idz")
-    end
-end
-
 -- find the weakest party member, who is being attacked
 -- return id or 0
 function eld.guardhelper:find_weakest()
@@ -93,16 +78,24 @@ end
 
 function eld.guardhelper:za_func()
 
-    if ateam.objs[ateam.my_id]["team_leader"] then
+    if ateam.objs[ateam.my_id]["team_leader"] and eld.guardhelper.respect_attack_flags == "true" then
       if ateam.attack_mode > 2 then
-        send("rozkaz zaslonic ob_"..id);
+        if ateam.my_id == self.guardId then
+          send("rozkaz druzynie zaslonic cie");
+        else
+          send("rozkaz zaslonic ob_"..self.guardId);
+        end
       end
       if ateam.attack_mode > 1 then
-        send("wskaz ob_"..id.." jako cel obrony");
+        if ateam.my_id == self.guardId then
+          send("wskaz siebie jako cel obrony")
+        else
+          send("wskaz ob_"..self.guardId.." jako cel obrony");
+        end
       end
     end
 
-    ateam:team(self.guardId)
+    ateam:za_func(ateam.team[self.guardId])
 end
 
 function eld.guardhelper:clear_state()
