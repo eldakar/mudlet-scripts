@@ -3,18 +3,6 @@ eld.guardhelper = eld.guardhelper or {
   state = {}
 }
 
-scripts:print_log("Laduje dodatki Eldka...")
-
---TODO
---
---Gag na Przestan zaslaniac xxx.
---Gag na ATKAUJE CIE
---Gag na Nikt nie atakuje xyz.
---Gag Nie zaslaniasz nikogo.
---Gag na Przeciez nikt cie nie zaslania.
---Prezstawienie paskow Kondycja,zmeczenie,mana w kolumnie.
---Gag Nie jestes jeszcze gotow do wykonania tego manewru
-
 function follow_path()
     if amap.path_display.destination then
     getPath(amap.curr.id, amap.path_display.destination)
@@ -30,6 +18,8 @@ function follow_path()
     end
 end
 
+-- find the weakest party member, who is being attacked
+-- return id or 0
 function eld.guardhelper:find_weakest()
   local teamWeakestMemberId=0
   local teamWeakestMemberHp=10
@@ -76,21 +66,12 @@ function eld.guardhelper:find_weakest()
   end
 
   -- overwrite the value with the defence_target marked
+  -- ! OPTIONAL ! , can (should?) be commented out
   if not ateam.objs[ateam.my_id]["team_leader"] and savedDefenceTarget > 0 then
     suggestedGuardTarget = savedDefenceTarget
   end
 
-  --if suggestedGuardTarget == ateam.my_id or suggestedGuardTarget == 0 then
-  --  print("Jestes najslabszy, wyluzuj...")
-  --else
-    --ateam:za_func(ateam.team[suggestedGuardTarget])
-  -- print("Zaslonilbys "..suggestedGuardTarget.." czyli: "..ateam.team[suggestedGuardTarget])
-  --end
-
   return suggestedGuardTarget
-  --scripts:print_log("Probuje zaslonic: " .. suggestedGuardTarget)
-  --send("zaslon ob_" .. suggestedGuardTarget)
-  --send("przestan zaslaniac")
 end
 
 
@@ -100,24 +81,28 @@ function eld.guardhelper:highlight_state()
 
   if anyone_to_guard > 0 then
       self.guardId = anyone_to_guard
-      --print("chce podmienic: "..ateam.objs[anyone_to_guard]["desc"])
-      --/lua display(ateam.options.own_name)
       if anyone_to_guard == ateam.my_id then
-        nick_to_guard = ateam.options.own_name      
+        nick_to_guard = ateam.options.own_name
+        scripts.ui.window_modify(scripts.ui.states_window_name, nick_to_guard, scripts.ui.window_modifiers.surround("⛔ ", ""))  
       else
         nick_to_guard = ateam.objs[anyone_to_guard]["desc"]
-        --myaliasID = tempAlias("^/guardhelper$", function() ateam:za_func(anyone_to_guard) end)
-
+        scripts.ui.window_modify(scripts.ui.states_window_name, nick_to_guard, scripts.ui.window_modifiers.surround("🛡 ", ""))
       end
-      scripts.ui.window_modify(scripts.ui.states_window_name, nick_to_guard, scripts.ui.window_modifiers.surround("🙏 ", ""))
   end
 end
 
+function eld.guardhelper:za_func()
 
-function eld.guardhelper:highlight_state_test()
+    if ateam.objs[ateam.my_id]["team_leader"] then
+      if ateam.attack_mode > 2 then
+        send("rozkaz zaslonic ob_"..id);
+      end
+      if ateam.attack_mode > 1 then
+        send("wskaz ob_"..id.." jako cel obrony");
+      end
+    end
 
-      scripts.ui.window_modify(scripts.ui.states_window_name, "Eldzio", scripts.ui.window_modifiers.surround("🙏 ", ""))
-
+    ateam:team(self.guardId)
 end
 
 function eld.guardhelper:clear_state()
@@ -126,50 +111,6 @@ end
 
 function eld.guardhelper:init()
   self.statesHandler = scripts.event_register:register_singleton_event_handler(self.statesHandler, "printStatusDone", function() self:highlight_state() end)
---  self.statesClearHandler = scripts.event_register:register_singleton_event_handler(self.statesClearHandler, "amapNewLocation", function()
---      registerAnonymousEventHandler("gmcp.room.info", function() self.clear_state() end, true)
---  end)
 end
 
-
 eld.guardhelper:init()
-
-
-
-
-
-
-
-
-
-  function zaslon_leszcza_ilosc()
-    local id_leszcza
-    local max_wrogowie_leszcza=0
-    local tmpMemberHp=7
-
-    -- check if empty
-    if not ateam.team_enemies or table.size(ateam.team_enemies) == 0 then
-      return 0
-    end
-    
-    for v, k in pairs(ateam.team) do
-      if type(v) == "number" then
-        
-        if table.size(ateam.team_enemies[v]) > max_wrogowie_leszcza and k ~= '@' then
-           
-           id_leszcza = v
-           max_wrogowie_leszcza = table.size(ateam.team_enemies[v])
-       
-          end
-       end
-     end
-      
-    if id_leszcza then 
-    
-      send("zaslon ob_" .. id_leszcza)
-      send("przestan zaslaniac")
-      --ateam:zas_func(id_leszcza)
-    
-    end
-    
-  end
