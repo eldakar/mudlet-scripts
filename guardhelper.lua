@@ -59,7 +59,6 @@ function eld.guardhelper:find_weakest()
   return suggestedGuardTarget
 end
 
-
 function eld.guardhelper:highlight_state()
   local anyone_to_guard = self:find_weakest()
   local nick_to_guard = 0

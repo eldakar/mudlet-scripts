@@ -1,5 +1,6 @@
 eld = eld or {}
 return {
     "guardhelper",
-    "enemynames"
+    "enemynames",
+    "navseparator"
 }

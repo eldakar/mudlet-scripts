@@ -3,7 +3,7 @@ eld.enemynames = eld.enemynames or {
   state = {}
 }
 
-function scripts.ui.window_modifiers.replace(strTo)
+function scripts.ui.window_modifiers.creplace(strTo)
   return function(windowName, position, text)
       moveCursor(windowName, position.x, position.y)
       creplace(windowName, strTo)
@@ -11,10 +11,32 @@ function scripts.ui.window_modifiers.replace(strTo)
   end
 end
 
+function scripts.ui.window_modifiers.replace(strTo)
+  return function(windowName, position, text)
+      moveCursor(windowName, position.x, position.y)
+      replace(windowName, strTo, true)
+      moveCursor(windowName, 1, position.y)
+  end
+end
+
+function eld.enemynames:replace_guardian_header()
+  local attackFlagTitle = "<white>AM: <yellow>"..ateam.footer_info_attack_mode_to_text[ateam.attack_mode].."<white> | "
+  scripts.ui.window_modify(scripts.ui.states_window_name, "RON", scripts.ui.window_modifiers.replace("R"))
+  scripts.ui.window_modify(scripts.ui.states_window_name, "ZASLONA", scripts.ui.window_modifiers.replace("MA"))
+  scripts.ui.window_modify(scripts.ui.states_window_name, "ROZKAZ", scripts.ui.window_modifiers.replace("RO"))
+  scripts.ui.window_modify(scripts.ui.states_window_name, "UKRYTY", scripts.ui.window_modifiers.replace("UK"))
+  scripts.ui.window_modify(scripts.ui.states_window_name, "||", scripts.ui.window_modifiers.replace("|"))
+  scripts.ui.window_modify(scripts.ui.states_window_name, "||", scripts.ui.window_modifiers.replace("|"))
+  scripts.ui.window_modify(scripts.ui.states_window_name, "||", scripts.ui.window_modifiers.replace("|"))
+  scripts.ui.window_modify(scripts.ui.states_window_name, "=========", scripts.ui.window_modifiers.replace(""))
+  scripts.ui.window_modify(scripts.ui.states_window_name, "BR", scripts.ui.window_modifiers.surround(attackFlagTitle, ""))   
+ 
+end
+
 
 function eld.enemynames:highlight_state()
---  local anyone_to_guard = self:find_weakest()
---  local nick_to_guard = 0
+
+    self:replace_guardian_header()
 
     for v, k in pairs(ateam.team) do
       local tmp_nick = ""
