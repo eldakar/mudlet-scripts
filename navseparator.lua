@@ -1,7 +1,5 @@
 -- default nav separator
-scripts.ui.cfg["states_window_nav_elements_separator"] = {
-    "||"
-}
+scripts.ui.cfg.states_window_nav_elements_separator = "||"
 
 function scripts.ui:navbar_updates(name, force)
     if not scripts.ui.cfg.states_window_nav_hash[name] and not force then
