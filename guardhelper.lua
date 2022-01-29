@@ -59,7 +59,7 @@ function eld.guardhelper:find_weakest()
   return suggestedGuardTarget
 end
 
-function eld.guardhelper:highlight_state()
+function eld.guardhelper:render_shields()
   local anyone_to_guard = self:find_weakest()
   local nick_to_guard = 0
 
@@ -73,6 +73,48 @@ function eld.guardhelper:highlight_state()
         scripts.ui.window_modify(scripts.ui.states_window_name, nick_to_guard, scripts.ui.window_modifiers.surround("🛡 ", ""))
       end
   end
+end
+
+function eld.guardhelper:utils_enemy_count_table(count)
+  local cnt_tbl = 
+  {
+    [0] = "[  ]",
+    [1] = "<white>[ <yellow>1<white>]",
+    [2] = "<white>[ <yellow>2<white>]",
+    [3] = "<white>[ <red>3<white>]",
+    [4] = "<white>[ <red>4<white>]",
+    [5] = "<white>[ <red>5<white>]",
+    [6] = "<white>[ <red>6<white>]",
+    [7] = "<white>[ <red>7<white>]",
+    [8] = "<white>[ <red>8<white>]",
+    [9] = "<white>[ <red>9<white>]",
+    [10] = "<white>[ <red>10<white>]",                    
+  }
+
+  return cnt_tbl[count]
+end
+
+function eld.guardhelper:render_enemy_counts()
+    for k, v in pairs(ateam.team) do
+      local team_enemies_string = ""
+      if ateam.objs[k] then
+        team_enemies_string = self:utils_enemy_count_table(table.size(ateam.team_enemies[k]))
+        
+        if k == ateam.my_id then
+            scripts.ui.window_modify(scripts.ui.states_window_name, ateam.options.own_name, scripts.ui.window_modifiers.surround(team_enemies_string.." ", ""))
+        else
+          scripts.ui.window_modify(scripts.ui.states_window_name, ateam.objs[k]["desc"], scripts.ui.window_modifiers.surround(team_enemies_string.." ", ""))          
+        end
+
+      end
+    end
+
+end
+
+
+function eld.guardhelper:highlight_state()
+  --self:render_enemy_counts()
+  self:render_shields()
 end
 
 function eld.guardhelper:za_func()
@@ -93,8 +135,10 @@ function eld.guardhelper:za_func()
         end
       end
     end
-
-    ateam:za_func(ateam.team[self.guardId])
+  --  if scripts.ui.states_window_nav_states["guard_state"] == "ok" then
+      ateam:za_func(ateam.team[self.guardId])
+--    end
+    
 end
 
 function eld.guardhelper:clear_state()
